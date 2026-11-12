@@ -1,0 +1,495 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "cpu",
+      "displayName": "CPU con importadores incluidos, sin dependencias del sistema",
+      "binaryDir": "${sourceDir}/build/cpu",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "BUILD_SHARED_LIBS": "OFF",
+        "EMBER_OPENGL": "OFF",
+        "EMBER_VULKAN": "OFF",
+        "EMBER_LUA": "OFF",
+        "EMBER_VIEWER": "OFF",
+        "EMBER_RMLUI": "OFF",
+        "EMBER_JOLT": "OFF"
+      }
+    },
+    {
+      "name": "editor",
+      "displayName": "Editor SDL2 + CPU, sin Lua ni GPU",
+      "inherits": "cpu",
+      "binaryDir": "${sourceDir}/build/editor",
+      "cacheVariables": {
+        "EMBER_VIEWER": "ON",
+        "EMBER_NOVA": "OFF"
+      }
+    },
+    {
+      "name": "desktop",
+      "displayName": "CPU + Vulkan + OpenGL + Lua + RmlUi",
+      "binaryDir": "${sourceDir}/build/desktop",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "BUILD_SHARED_LIBS": "OFF",
+        "EMBER_OPENGL": "ON",
+        "EMBER_VULKAN": "ON",
+        "EMBER_LUA": "ON",
+        "EMBER_VIEWER": "ON",
+        "EMBER_RMLUI": "ON",
+        "EMBER_JOLT": "OFF"
+      }
+    },
+    {
+      "name": "runtime",
+      "displayName": "CPU m\u00ednimo: recursos precocinados, sin importadores",
+      "inherits": "cpu",
+      "binaryDir": "${sourceDir}/build/runtime",
+      "cacheVariables": {
+        "EMBER_IMPORTERS": "OFF",
+        "EMBER_TOOLS": "OFF",
+        "EMBER_EXAMPLES": "OFF",
+        "EMBER_VFX": "OFF",
+        "EMBER_NOVA": "OFF",
+        "EMBER_TESTS": "OFF"
+      }
+    },
+    {
+      "name": "runtime-tests",
+      "displayName": "Validate minimal runtime without importers or tools",
+      "inherits": "runtime",
+      "binaryDir": "${sourceDir}/build/runtime-tests",
+      "cacheVariables": {
+        "EMBER_TESTS": "ON"
+      }
+    },
+    {
+      "name": "linux-x64",
+      "inherits": "cpu",
+      "binaryDir": "${sourceDir}/build/linux-x64",
+      "cacheVariables": {
+        "EMBER_VULKAN": "ON",
+        "EMBER_VIEWER": "ON",
+        "EMBER_APP": "ON",
+        "EMBER_OPENGL": "OFF",
+        "RETRATO_EXPECT_ARCH": "x86_64"
+      }
+    },
+    {
+      "name": "linux-arm64-native",
+      "inherits": "linux-x64",
+      "binaryDir": "${sourceDir}/build/linux-arm64-native",
+      "cacheVariables": {
+        "RETRATO_EXPECT_ARCH": "arm64"
+      }
+    },
+    {
+      "name": "linux-arm64",
+      "inherits": "cpu",
+      "binaryDir": "${sourceDir}/build/linux-arm64",
+      "cacheVariables": {
+        "RETRATO_EXPECT_ARCH": "arm64"
+      },
+      "toolchainFile": "${sourceDir}/cmake/toolchains/linux-arm64.cmake"
+    },
+    {
+      "name": "linux-x86",
+      "inherits": "cpu",
+      "binaryDir": "${sourceDir}/build/linux-x86",
+      "cacheVariables": {
+        "RETRATO_EXPECT_ARCH": "x86"
+      },
+      "toolchainFile": "${sourceDir}/cmake/toolchains/linux-x86.cmake"
+    },
+    {
+      "name": "windows-x64",
+      "inherits": "cpu",
+      "binaryDir": "${sourceDir}/build/windows-x64",
+      "cacheVariables": {
+        "EMBER_APP": "ON",
+        "EMBER_VIEWER": "ON",
+        "EMBER_VULKAN": "ON",
+        "EMBER_OPENGL": "OFF",
+        "RETRATO_EXPECT_ARCH": "x86_64"
+      },
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64"
+    },
+    {
+      "name": "windows-arm64",
+      "inherits": "cpu",
+      "binaryDir": "${sourceDir}/build/windows-arm64",
+      "cacheVariables": {
+        "EMBER_APP": "ON",
+        "EMBER_VIEWER": "ON",
+        "EMBER_VULKAN": "ON",
+        "EMBER_OPENGL": "OFF",
+        "RETRATO_EXPECT_ARCH": "arm64"
+      },
+      "generator": "Visual Studio 17 2022",
+      "architecture": "ARM64"
+    },
+    {
+      "name": "windows-x86",
+      "inherits": "cpu",
+      "binaryDir": "${sourceDir}/build/windows-x86",
+      "cacheVariables": {
+        "EMBER_APP": "ON",
+        "EMBER_VIEWER": "ON",
+        "EMBER_VULKAN": "ON",
+        "EMBER_OPENGL": "OFF",
+        "RETRATO_EXPECT_ARCH": "x86"
+      },
+      "generator": "Visual Studio 17 2022",
+      "architecture": "Win32"
+    },
+    {
+      "name": "windows-x64-mingw",
+      "inherits": "cpu",
+      "binaryDir": "${sourceDir}/build/windows-x64-mingw",
+      "cacheVariables": {
+        "RETRATO_EXPECT_ARCH": "x86_64"
+      },
+      "toolchainFile": "${sourceDir}/cmake/toolchains/windows-x64-mingw.cmake"
+    },
+    {
+      "name": "android-arm64",
+      "inherits": "runtime",
+      "binaryDir": "${sourceDir}/build/android-arm64",
+      "cacheVariables": {
+        "ANDROID_ABI": "arm64-v8a",
+        "ANDROID_PLATFORM": "android-24",
+        "EMBER_APP": "ON",
+        "EMBER_NOVA": "OFF",
+        "EMBER_VULKAN": "ON",
+        "RETRATO_EXPECT_ARCH": "arm64"
+      },
+      "toolchainFile": "${sourceDir}/cmake/toolchains/android.cmake"
+    },
+    {
+      "name": "android-x64",
+      "inherits": "runtime",
+      "binaryDir": "${sourceDir}/build/android-x64",
+      "cacheVariables": {
+        "ANDROID_ABI": "x86_64",
+        "ANDROID_PLATFORM": "android-24",
+        "EMBER_APP": "ON",
+        "EMBER_NOVA": "OFF",
+        "EMBER_VULKAN": "ON",
+        "RETRATO_EXPECT_ARCH": "x86_64"
+      },
+      "toolchainFile": "${sourceDir}/cmake/toolchains/android.cmake"
+    },
+    {
+      "name": "android-armv7",
+      "inherits": "runtime",
+      "binaryDir": "${sourceDir}/build/android-armv7",
+      "cacheVariables": {
+        "ANDROID_ABI": "armeabi-v7a",
+        "ANDROID_PLATFORM": "android-24",
+        "EMBER_APP": "ON",
+        "EMBER_NOVA": "OFF",
+        "EMBER_VULKAN": "ON",
+        "RETRATO_EXPECT_ARCH": "armv7"
+      },
+      "toolchainFile": "${sourceDir}/cmake/toolchains/android.cmake"
+    },
+    {
+      "name": "android-x86",
+      "inherits": "runtime",
+      "binaryDir": "${sourceDir}/build/android-x86",
+      "cacheVariables": {
+        "ANDROID_ABI": "x86",
+        "ANDROID_PLATFORM": "android-24",
+        "EMBER_APP": "ON",
+        "EMBER_NOVA": "OFF",
+        "EMBER_VULKAN": "ON",
+        "RETRATO_EXPECT_ARCH": "x86"
+      },
+      "toolchainFile": "${sourceDir}/cmake/toolchains/android.cmake"
+    },
+    {
+      "name": "linux-armv7",
+      "inherits": "cpu",
+      "binaryDir": "${sourceDir}/build/linux-armv7",
+      "cacheVariables": {
+        "RETRATO_EXPECT_ARCH": "armv7"
+      },
+      "toolchainFile": "${sourceDir}/cmake/toolchains/linux-armv7.cmake"
+    },
+    {
+      "name": "linux-armv7-native",
+      "inherits": "linux-arm64-native",
+      "binaryDir": "${sourceDir}/build/linux-armv7-native",
+      "cacheVariables": {
+        "RETRATO_EXPECT_ARCH": "armv7"
+      }
+    },
+    {
+      "name": "linux-x64-compat",
+      "inherits": "linux-x64",
+      "binaryDir": "${sourceDir}/build/linux-x64-compat",
+      "cacheVariables": {
+        "EMBER_OPENGL": "ON"
+      }
+    },
+    {
+      "name": "windows-x64-compat",
+      "inherits": "windows-x64",
+      "binaryDir": "${sourceDir}/build/windows-x64-compat",
+      "cacheVariables": {
+        "EMBER_OPENGL": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "cpu",
+      "configurePreset": "cpu",
+      "jobs": 2
+    },
+    {
+      "name": "editor",
+      "configurePreset": "editor",
+      "jobs": 2
+    },
+    {
+      "name": "desktop",
+      "configurePreset": "desktop",
+      "jobs": 2
+    },
+    {
+      "name": "runtime-tests",
+      "configurePreset": "runtime-tests",
+      "jobs": 2
+    },
+    {
+      "name": "runtime",
+      "configurePreset": "runtime",
+      "jobs": 2
+    },
+    {
+      "name": "linux-x64",
+      "configurePreset": "linux-x64",
+      "configuration": "Release",
+      "jobs": 2
+    },
+    {
+      "name": "linux-arm64-native",
+      "configurePreset": "linux-arm64-native",
+      "configuration": "Release",
+      "jobs": 2
+    },
+    {
+      "name": "linux-arm64",
+      "configurePreset": "linux-arm64",
+      "configuration": "Release",
+      "jobs": 2
+    },
+    {
+      "name": "linux-x86",
+      "configurePreset": "linux-x86",
+      "configuration": "Release",
+      "jobs": 2
+    },
+    {
+      "name": "windows-x64",
+      "configurePreset": "windows-x64",
+      "configuration": "Release",
+      "jobs": 2
+    },
+    {
+      "name": "windows-arm64",
+      "configurePreset": "windows-arm64",
+      "configuration": "Release",
+      "jobs": 2
+    },
+    {
+      "name": "windows-x86",
+      "configurePreset": "windows-x86",
+      "configuration": "Release",
+      "jobs": 2
+    },
+    {
+      "name": "windows-x64-mingw",
+      "configurePreset": "windows-x64-mingw",
+      "configuration": "Release",
+      "jobs": 2
+    },
+    {
+      "name": "android-arm64",
+      "configurePreset": "android-arm64",
+      "configuration": "Release",
+      "jobs": 2
+    },
+    {
+      "name": "android-x64",
+      "configurePreset": "android-x64",
+      "configuration": "Release",
+      "jobs": 2
+    },
+    {
+      "name": "android-armv7",
+      "configurePreset": "android-armv7",
+      "configuration": "Release",
+      "jobs": 2
+    },
+    {
+      "name": "android-x86",
+      "configurePreset": "android-x86",
+      "configuration": "Release",
+      "jobs": 2
+    },
+    {
+      "name": "linux-armv7",
+      "configurePreset": "linux-armv7",
+      "configuration": "Release",
+      "jobs": 2
+    },
+    {
+      "name": "linux-armv7-native",
+      "configurePreset": "linux-armv7-native",
+      "configuration": "Release",
+      "jobs": 2
+    },
+    {
+      "name": "linux-x64-compat",
+      "configurePreset": "linux-x64-compat",
+      "configuration": "Release",
+      "jobs": 2
+    },
+    {
+      "name": "windows-x64-compat",
+      "configurePreset": "windows-x64-compat",
+      "configuration": "Release",
+      "jobs": 2
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "cpu",
+      "configurePreset": "cpu",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "editor",
+      "configurePreset": "editor",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "desktop",
+      "configurePreset": "desktop",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "runtime-tests",
+      "configurePreset": "runtime-tests",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "linux-x64",
+      "configurePreset": "linux-x64",
+      "configuration": "Release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "linux-arm64-native",
+      "configurePreset": "linux-arm64-native",
+      "configuration": "Release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "linux-arm64",
+      "configurePreset": "linux-arm64",
+      "configuration": "Release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "linux-x86",
+      "configurePreset": "linux-x86",
+      "configuration": "Release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "windows-x64",
+      "configurePreset": "windows-x64",
+      "configuration": "Release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "windows-arm64",
+      "configurePreset": "windows-arm64",
+      "configuration": "Release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "windows-x86",
+      "configurePreset": "windows-x86",
+      "configuration": "Release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "windows-x64-mingw",
+      "configurePreset": "windows-x64-mingw",
+      "configuration": "Release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "linux-armv7",
+      "configurePreset": "linux-armv7",
+      "configuration": "Release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "linux-armv7-native",
+      "configurePreset": "linux-armv7-native",
+      "configuration": "Release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "linux-x64-compat",
+      "configurePreset": "linux-x64-compat",
+      "configuration": "Release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "windows-x64-compat",
+      "configurePreset": "windows-x64-compat",
+      "configuration": "Release",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
+  ]
+}
