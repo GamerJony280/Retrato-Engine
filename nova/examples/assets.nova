@@ -1,0 +1,9 @@
+// Paths are relative to the executable's working directory (run inside ember).
+var robot_asset: Asset = load_asset("assets/robot.embasset")
+var robot: Entity = spawn(robot_asset, "robot")
+
+func update(delta: float) {
+    var p: Vec3 = position(robot)
+    p.x += delta
+    set_position(robot, p)
+}

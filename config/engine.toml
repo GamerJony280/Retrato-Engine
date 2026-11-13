@@ -1,0 +1,38 @@
+# Retrato 0.7: settings only. auto prefers Vulkan; optional GL, then CPU.
+[graphics]
+# false preserves classic PS1 painter ordering; true enables depth occlusion.
+ps1_depth_test = false
+backend = "auto"
+profile = "pixel" # normal, ps1, n64, pixel
+filter = "normal" # normal, crt
+resolution_quality = 35
+lighting_quality = 35 # Pixel shadow grid density, independent of image resolution
+shadow_distance = 32 # Width of the directional shadow region in world units
+shadow_quality = 20
+toon_bands = 4
+local_lights_per_object = 2
+shadowed_lights = 1
+pixel_upscale = true
+
+[collision_cooking]
+quality = 70
+static_shape = "mesh_bvh"
+dynamic_shape = "convex_compound"
+
+[physics]
+backend = "none" # none or jolt (requires a build with EMBER_JOLT=ON)
+plane = "3d" # 3d, xy, xz or yz; 2.5D games usually choose xy
+gravity_x = 0.0
+gravity_y = -9.81
+gravity_z = 0.0
+solver_quality = 40
+fixed_hz = 60
+continuous_collision = "selected"
+max_bodies = 4096
+max_body_pairs = 4096
+max_contacts = 2048
+temporary_mb = 4
+
+[runtime]
+worker_threads = -1
+streaming = true

@@ -1,0 +1,21 @@
+<rml>
+<head><title>Ember</title><link type="text/rcss" href="menu.rcss" /></head>
+<body>
+ <div id="panel">
+  <div class="eyebrow">REALTIME / RETRO LAB</div>
+  <h1>EMBER<span class="accent">.</span></h1>
+  <p class="subtitle">Small engine. Your rules.</p>
+  <div class="rule"></div>
+  <p class="label">VISUAL PROFILE</p>
+  <button id="ps1">01 / PS1</button>
+  <button id="n64">02 / N64</button>
+  <button id="pixel">03 / PIXEL TOON</button>
+  <button id="normal">04 / CLEAN</button>
+  <div class="rule"></div>
+  <button id="crt" class="secondary">TOGGLE CRT</button>
+  <button id="pause" class="secondary">PAUSE / RESUME</button>
+  <p id="status">pixel / normal / live</p>
+ </div>
+ <div id="footer">1-4 profiles  /  C CRT  /  SPACE pause  /  arrows orbit  /  ESC exit</div>
+</body>
+</rml>

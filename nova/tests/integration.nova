@@ -1,0 +1,64 @@
+var speed: float = 2.0
+var health: int = 100
+var signal_count: int = 0
+
+func check(ok: bool) {
+    if !ok { var failure: int = 1 / 0 }
+}
+
+func compute(a: int, b: int) -> int {
+    if a > b { return a - b } else { return b - a }
+}
+
+func start() {
+    check(1 + 2 * 3 == 7 && 10 % 3 == 1)
+    check(compute(8, 3) == 5)
+    check(compute(3, 8) == 5)
+    check(3 <= 3 && 4 >= 3 && 3 != 4 && 9 / 2 == 4)
+    var fraction: float = 9 / 2.0
+    fraction -= 0.5
+    fraction *= 2
+    fraction /= 4
+    check(fraction == 2.0)
+    var health: int = health + 1
+    check(health == 101)
+    var i: int = 0
+    while i < 3 { i += 1 }
+    check(i == 3)
+    var minimum: int = -9223372036854775808
+    check(minimum % -1 == 0)
+    var p: Vec2 = Vec2(1, 2) + Vec2(2, 3)
+    p *= 2
+    p /= 2
+    check(p.x == 3 && p.y == 5)
+    var v: Vec3 = Vec3(4, 5, 6) - Vec3(1, 2, 3)
+    check(v.z == 3)
+    var text: string = "hello" + " world"
+    check(text == "hello world")
+    // Short circuit must skip the invalid division.
+    check(true || 1 / 0 == 0)
+    check(!(false && 1 / 0 == 0))
+    // Evaluation order must be left-to-right.
+    var n: int = 1
+    check((n += 1) + (n *= 3) == 8)
+    set_position(self, Vec3(0, 0, 0))
+    check(position(self).x == transform.position.x)
+    save_set_int("health", health)
+    save_set_vec3("position", Vec3(1, 2, 3))
+    save_write("nova-test.embsave")
+    save_set_int("health", 0)
+    save_read("nova-test.embsave")
+    check(save_get_int("health") == 101 && save_get_vec3("position").z == 3)
+    emit(42)
+}
+
+func on_signal(code: int) {
+    check(code == 42)
+    signal_count += 1
+    transform.yaw = 0.5
+}
+
+func update(delta: float) {
+    transform.position.x += speed * delta
+    if time() > 0.5 { check(signal_count == 1) }
+}

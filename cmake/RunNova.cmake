@@ -1,0 +1,8 @@
+execute_process(COMMAND "${COMPILER}" --module-api RESULT_VARIABLE result OUTPUT_VARIABLE api ERROR_VARIABLE error OUTPUT_STRIP_TRAILING_WHITESPACE)
+if(NOT result EQUAL 0 OR NOT api STREQUAL "2")
+ message(FATAL_ERROR "The selected HOST Nova compiler is incompatible. This build requires Nova module API 2. Rebuild the host compiler with tools/build.py host-tools. ${error}")
+endif()
+execute_process(COMMAND "${COMPILER}" --emit-cpp "${SOURCE}" -o "${OUTPUT}" --depfile "${DEPFILE}" RESULT_VARIABLE result)
+if(NOT result EQUAL 0)
+ message(FATAL_ERROR "Nova compilation failed; see the source diagnostic above")
+endif()

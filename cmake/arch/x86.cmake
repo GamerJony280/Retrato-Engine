@@ -1,0 +1,1 @@
+set(RETRATO_TARGET_ARCH x86)

@@ -1,0 +1,6 @@
+<rml>
+<head><title>fps</title><link type="text/rcss" href="fps.rcss" /></head>
+<body>
+ <div id="fpsbox"><span id="fps">--</span><span class="unit"> FPS</span></div>
+</body>
+</rml>

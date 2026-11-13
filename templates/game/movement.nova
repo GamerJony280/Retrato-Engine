@@ -1,0 +1,5 @@
+var speed: float = 1.0
+func update(delta: float) {
+    transform.position.x += speed * delta
+    if transform.position.x > 3.0 { transform.position.x = -3.0 }
+}

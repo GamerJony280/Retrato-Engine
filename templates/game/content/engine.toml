@@ -1,0 +1,11 @@
+[graphics]
+# auto tries Vulkan first; an explicit name fails if unavailable.
+backend = "auto"
+profile = "pixel"
+resolution_quality = 35
+lighting_quality = 35
+shadow_quality = 20
+toon_bands = 4
+
+[runtime]
+worker_threads = -1

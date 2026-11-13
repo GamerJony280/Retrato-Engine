@@ -1,0 +1,21 @@
+import "collections_helper.nova"
+var points: Vec3[]=array_vec3(4,Vec3(0,0,0))
+var actors: Entity[]=array_entity(2,self)
+var flags: bool[]=array_bool(2,false)
+var numbers: int[]=array_int(2,4)
+func nested(a: int, unused: bool) -> int {
+    var unused_local: float = 1.5
+    return (a + 1) * (a + 2)
+}
+func start() {
+    points[2].x=3; flags[1]=true
+    verify(points[2].x==3 && flags[1] && sum(numbers)==8)
+    var copy: int[]=numbers
+    copy[0]=9; verify(numbers[0]==4 && len(copy)==2)
+    actors[1]=create("second")
+    verify(actors[0]==self && actors[1]!=self)
+    verify(nested(sum(numbers) + numbers[1], true) == 182)
+    set_visible(actors[1],false)
+}
+func update(dt: float) { transform.position.x+=2*dt }
+func count() -> int { return len(actors) }

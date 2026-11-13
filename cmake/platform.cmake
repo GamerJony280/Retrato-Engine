@@ -1,0 +1,7 @@
+include("${CMAKE_CURRENT_LIST_DIR}/TargetIdentity.cmake")
+retrato_detect_target(RETRATO_TARGET_OS RETRATO_TARGET_ARCH)
+include("${CMAKE_CURRENT_LIST_DIR}/arch/${RETRATO_TARGET_ARCH}.cmake")
+if(DEFINED RETRATO_EXPECT_ARCH AND NOT RETRATO_EXPECT_ARCH STREQUAL RETRATO_TARGET_ARCH)
+ message(FATAL_ERROR "Requested ${RETRATO_EXPECT_ARCH}, but the compiler produces ${RETRATO_TARGET_ARCH}. Select the correct toolchain.")
+endif()
+message(STATUS "Retrato target: ${RETRATO_TARGET_OS}-${RETRATO_TARGET_ARCH}")

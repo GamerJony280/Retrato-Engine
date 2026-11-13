@@ -1,0 +1,36 @@
+# Ember v0.4.0: settings only, no game logic. See docs/STATUS.md.
+[graphics]
+backend = "auto"
+profile = "pixel" # normal, ps1, n64, pixel
+filter = "normal" # normal, crt
+resolution_quality = 70
+lighting_quality = 10 # Pixel shadow grid density, independent of image resolution
+shadow_distance = 16 # Width of the directional shadow region in world units
+shadow_quality = 70
+toon_bands = 4
+local_lights_per_object = 2
+shadowed_lights = 1
+pixel_upscale = true
+
+[collision_cooking]
+quality = 70
+static_shape = "mesh_bvh"
+dynamic_shape = "convex_compound"
+
+[physics]
+backend = "none"
+plane = "3d"
+gravity_x = 0.0
+gravity_y = -9.81
+gravity_z = 0.0
+solver_quality = 40
+fixed_hz = 60
+continuous_collision = "selected"
+max_bodies = 4096
+max_body_pairs = 4096
+max_contacts = 2048
+temporary_mb = 4
+
+[runtime]
+worker_threads = -1
+streaming = true

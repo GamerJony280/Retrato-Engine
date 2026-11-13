@@ -1,0 +1,147 @@
+name: Build and validate
+
+permissions:
+  contents: read
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  portable-core:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2022
+            arch: x64
+            name: windows-x64
+          - os: windows-11-arm
+            arch: ARM64
+            name: windows-arm64
+          - os: ubuntu-24.04-arm
+            arch: ''
+            name: linux-arm64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure portable core
+        shell: bash
+        run: |
+          if [ -n '${{ matrix.arch }}' ]; then
+            cmake --preset cpu -B build/portable -A '${{ matrix.arch }}'
+          else
+            cmake --preset cpu -B build/portable
+          fi
+      - run: cmake --build build/portable --config Release --parallel 2
+      - run: ctest --test-dir build/portable -C Release --output-on-failure
+
+  windows-application:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install SDL2 developer dependency
+        shell: pwsh
+        run: '& "$env:VCPKG_INSTALLATION_ROOT/vcpkg.exe" install sdl2:x64-windows vulkan-headers:x64-windows'
+      - name: Build application and Nova using a Windows entry point
+        shell: pwsh
+        run: |
+          cmake --preset windows-x64 -B build/windows-app -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -DEMBER_VULKAN=ON -DEMBER_STARTER=ON -DGAME_USE_NOVA=ON
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          cmake --build build/windows-app --config Release --parallel 2
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          ctest --test-dir build/windows-app -C Release --output-on-failure
+      - name: Launch portable window
+        env:
+          SDL_RENDER_DRIVER: software
+        run: ./build/windows-app/templates/game/Release/retrato_game.exe --frames 3 --backend cpu
+
+  android-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install pinned Android tools
+        run: sdkmanager 'ndk;27.2.12479018' 'platforms;android-35' 'build-tools;35.0.0' 'cmake;3.22.1'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Build host Nova compiler
+        run: python3 tools/build.py host-tools
+      - name: Compile APK for ARM64 and x86-64
+        run: gradle -p platform/android assembleDebug -Pabis=arm64-v8a,x86_64 -Pnova=true -PnovaHost="$PWD/build/host-tools/nova/nova"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-debug-apk-unverified-on-device
+          path: platform/android/app/build/outputs/apk/debug/*.apk
+
+  linux-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure dependency-free CPU build
+        run: cmake --preset cpu
+      - name: Build
+        run: cmake --build --preset cpu
+      - name: Test engine, compiler and gameplay validation
+        run: ctest --preset cpu
+      - name: Configure and build minimal runtime
+        run: |
+          cmake --preset runtime
+          cmake --build --preset runtime
+          cmake --preset runtime-tests
+          cmake --build --preset runtime-tests
+          ctest --preset runtime-tests
+      - name: Validate optional VFX exclusion
+        run: |
+          cmake --preset runtime-tests -B build/vfx-off -DEMBER_EXAMPLES=ON
+          cmake --build build/vfx-off --parallel 2
+          ctest --test-dir build/vfx-off --output-on-failure
+
+  linux-sanitizers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: >-
+          cmake --preset cpu -B build/sanitizers
+          -DCMAKE_BUILD_TYPE=Debug -DEMBER_NOVA=OFF
+          -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined,float-cast-overflow -fno-omit-frame-pointer"
+          -DCMAKE_C_FLAGS="-fsanitize=address,undefined,float-cast-overflow -fno-omit-frame-pointer"
+      - name: Build
+        run: cmake --build build/sanitizers --parallel 2
+      - name: Test
+        env:
+          ASAN_OPTIONS: detect_leaks=1:halt_on_error=1
+          UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1
+        run: ctest --test-dir build/sanitizers --output-on-failure
+
+  linux-desktop:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install desktop build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsdl2-dev libgl1-mesa-dev libvulkan-dev glslang-tools liblua5.4-dev libfreetype-dev mesa-vulkan-drivers xvfb
+      - name: Configure and build
+        run: |
+          cmake --preset desktop -DEMBER_APP=ON -DEMBER_STARTER=ON -DGAME_USE_NOVA=ON
+          cmake --build --preset desktop
+      - name: Test with software display
+        run: xvfb-run -a ctest --preset desktop
+      - name: Compare CPU and OpenGL
+        run: xvfb-run -a env EMBER_TEST_BACKEND=opengl ctest --preset desktop -R '^(ember_tests|ember_asset_tests|ember_vfx_tests|ember_vfx_context_tests|ember_render_contract_tests)$'
+      - name: Compare CPU and Vulkan
+        run: env EMBER_TEST_BACKEND=vulkan ctest --preset desktop -R '^(ember_tests|ember_asset_tests|ember_vfx_tests|ember_vfx_context_tests|ember_render_contract_tests)$'
+      - name: Present and resize native GPU windows
+        run: |
+          xvfb-run -a ./build/desktop/ember_presentation_tests opengl
+          xvfb-run -a ./build/desktop/ember_presentation_tests vulkan
+      - name: Verify installed SDK after relocation
+        run: |
+          cmake --install build/desktop --prefix "$PWD/stage-sdk"
+          python3 tools/verify_sdk.py "$PWD/stage-sdk" --nova

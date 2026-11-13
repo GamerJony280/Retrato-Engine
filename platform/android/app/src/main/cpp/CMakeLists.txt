@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.20)
+project(RetratoAndroid LANGUAGES C CXX)
+if(NOT EXISTS "${RETRATO_GAME_SOURCE}/CMakeLists.txt")
+ message(FATAL_ERROR "RETRATO_GAME_SOURCE must contain the game CMakeLists.txt")
+endif()
+add_subdirectory("${RETRATO_GAME_SOURCE}" game)

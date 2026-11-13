@@ -1,0 +1,30 @@
+plugins { id 'com.android.application' }
+def engine = providers.gradleProperty('retratoSource').getOrElse(rootProject.file('../..').absolutePath)
+def game = providers.gradleProperty('gameSource').getOrElse(new File(engine, 'templates/game').absolutePath)
+def abi = providers.gradleProperty('abis').getOrElse('arm64-v8a')
+def novaEnabled = providers.gradleProperty('nova').getOrElse('false') == 'true'
+android {
+    namespace 'org.retrato.starter'
+    compileSdk 35
+    ndkVersion '27.2.12479018'
+    defaultConfig {
+        applicationId 'org.retrato.starter'
+        minSdk 24
+        targetSdk 35
+        versionCode 1
+        versionName '0.7.0'
+        ndk { abiFilters.addAll(abi.split(',') as List) }
+        externalNativeBuild { cmake {
+            arguments "-DRETRATO_SOURCE_DIR=${engine}", "-DRETRATO_GAME_SOURCE=${game}", '-DANDROID_STL=c++_static', '-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON', '-DEMBER_OPENGL=OFF', '-DEMBER_VIEWER=OFF', '-DEMBER_APP=ON', '-DEMBER_LUA=OFF', '-DEMBER_RMLUI=OFF', '-DEMBER_TOOLS=OFF', '-DEMBER_TESTS=OFF', '-DEMBER_EXAMPLES=OFF', '-DEMBER_VULKAN=ON', "-DGAME_USE_NOVA=${novaEnabled ? 'ON' : 'OFF'}"
+            if(novaEnabled) {
+                def host = providers.gradleProperty('novaHost').orNull
+                if(!host) throw new GradleException('Nova Android build needs -PnovaHost=/path/to/HOST/nova; run tools/build.py host-tools first')
+                arguments "-DNOVA_HOST_COMPILER=${host}"
+            }
+            targets 'retrato_game'
+            cppFlags '-std=c++17'
+        } }
+    }
+    externalNativeBuild { cmake { path file('src/main/cpp/CMakeLists.txt'); version '3.22.1' } }
+    sourceSets { main { assets.srcDirs = [new File(game, 'content')] } }
+}

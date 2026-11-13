@@ -1,0 +1,10 @@
+// The native app supplies self and its transform.
+var speed: float = 2.0
+
+func start() {
+    print("Nova is moving an Ember object")
+}
+
+func update(delta: float) {
+    transform.position.x += speed * delta
+}

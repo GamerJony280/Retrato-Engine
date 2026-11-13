@@ -1,0 +1,3 @@
+#pragma once
+static constexpr const char* gl_vertex_source=R"EMBER(@VERTEX@)EMBER";
+static constexpr const char* gl_fragment_source=R"EMBER(@FRAGMENT@)EMBER";

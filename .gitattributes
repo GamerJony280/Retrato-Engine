@@ -1,0 +1,12 @@
+* text=auto eol=lf
+*.glb -text
+*.bin -text
+*.spv -text
+*.embasset -text
+*.fbx -text
+*.png -text
+*.ttf -text
+
+# Preserve upstream/license bytes and vendored source hashes.
+third_party/** -text
+assets/FONT-LICENSE.txt -text
